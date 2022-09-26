@@ -1,3 +1,4 @@
+from os import stat
 from core.argparser import parse_args
 from core.helpers import (compute_td_loss,
                           initialize_models,
@@ -25,7 +26,7 @@ from config import EVAL_EPISODES, EVAL_MAX_STEPS
 
 coloredlogs.install(logging.DEBUG)
 
-MINERL_GYM_ENV = 'MineRLTreechop-v0'
+MINERL_GYM_ENV = 'MineRLBasaltFindCave-v0'
 
 def update_graph(model, target_model, optimizer, replay_buffer, args, device,
                  info):
@@ -54,15 +55,17 @@ def run_episode(env, model, target_model, optimizer, replay_buffer, args,
                 device, info, episode):
     episode_reward = 0.0
     state = env.reset()
+    img = env.render()
 
-    while True:
+    for step_counter in range(EVAL_MAX_STEPS):
         epsilon = update_epsilon(info.index, args)
-        action = model.act(state, device, epsilon)
-        if args.render:
-            env.render()
+        action = model.act(img, device, epsilon)
+        action['ESC'] = 0
+        img = env.render()
         next_state, reward, done, _ = env.step(action)
         replay_buffer.push(state, action, reward, next_state, done)
         state = next_state
+        episode_reward += action['forward'] + action['attack'] + action['back'] + action['jump'] + action['sprint']
         episode_reward += reward
         info.update_index()
         update_graph(model, target_model, optimizer, replay_buffer, args,
@@ -71,6 +74,10 @@ def run_episode(env, model, target_model, optimizer, replay_buffer, args,
             complete_episode(model, args.environment, info, episode_reward,
                              episode, epsilon)
             break
+    if episode_reward == 0.:
+        model, target_model = initialize_models(env, device, args.checkpoint)
+    # episode and reward print
+    print(f"[{episode}] Episode complete with reward {episode_reward}")
 
 
 def train(env, model, target_model, optimizer, replay_buffer, args, device):

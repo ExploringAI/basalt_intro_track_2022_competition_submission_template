@@ -45,7 +45,6 @@ def update_epsilon(episode, args):
         math.exp(-1 * ((episode + 1) / decay))
     return epsilon
 
-
 def set_device(force_cpu):
     device = torch.device('cpu')
     if not force_cpu and torch.cuda.is_available():
@@ -60,10 +59,8 @@ def load_model(checkpoint, model, target_model, device):
 
 
 def initialize_models(env, device, checkpoint):
-    model = CNNDQN(env.observation_space.shape,
-                   env.action_space.n).to(device)
-    target_model = CNNDQN(env.observation_space.shape,
-                          env.action_space.n).to(device)
+    model = CNNDQN((3, 640, 360), 25).to(device)
+    target_model = CNNDQN((3, 640, 360), 25).to(device)
     if checkpoint:
         model, target_model = load_model(checkpoint, model, target_model,
                                          device)

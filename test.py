@@ -4,11 +4,15 @@ import coloredlogs
 import aicrowd_gym
 import minerl
 
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
 from config import EVAL_EPISODES, EVAL_MAX_STEPS
 
 coloredlogs.install(logging.DEBUG)
 
-MINERL_GYM_ENV = 'MineRLObtainDiamondShovel-v0'
+MINERL_GYM_ENV = 'MineRLTreechop-v0'
 
 
 def main():
@@ -29,7 +33,11 @@ def main():
             # Currently, it's doing random actions
             random_act = env.action_space.sample()
 
+            # print action
+            print("Action: ", random_act)
+
             obs, reward, done, info = env.step(random_act)
+            img = env.render()
 
             if done:
                 break

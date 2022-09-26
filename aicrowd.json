@@ -1,6 +1,6 @@
 {
   "challenge_id": "neurips-2022-minerl-basalt-competition",
-  "authors": ["ExploringAI"],
+  "authors": ["Thaumstrial", "Dennis Wuitz", "ExploringAI"],
   "description": "Test Model for MineRL BASALT Challenge Intro Track",
   "licence": "MIT",
   "gpu": true,

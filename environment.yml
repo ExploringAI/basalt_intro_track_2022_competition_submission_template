@@ -13,4 +13,5 @@ dependencies:
     - matplotlib
     - aicrowd-api
     - aicrowd-gym
+    - pytorch
 

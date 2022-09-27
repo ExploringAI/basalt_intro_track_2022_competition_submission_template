@@ -51,7 +51,7 @@ class CNNDQN(nn.Module):
                     "ESC": to_binary(q_value[0][0]),
                     "attack": to_binary(q_value[0][1]),
                     "back": to_binary(q_value[0][2]),
-                    "camera": [round(q_value[0][3]*180), round(q_value[0][4]*180)],
+                    "camera": [q_value[0][3], q_value[0][4]],
                     "drop": to_binary(q_value[0][5]),
                     "forward": to_binary(q_value[0][6]),
                     "hotbar.1": to_binary(q_value[0][7]),

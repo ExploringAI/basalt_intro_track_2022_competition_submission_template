@@ -60,24 +60,25 @@ def run_episode(env, model, target_model, optimizer, replay_buffer, args,
     for step_counter in range(EVAL_MAX_STEPS):
         epsilon = update_epsilon(info.index, args)
         action = model.act(img, device, epsilon)
+        episode_reward -= 8*action['inventory']
         action['ESC'] = 0
+        action['inventory'] = 0
+        # action['camera'][0] = 0
         img = env.render()
         next_state, reward, done, _ = env.step(action)
         replay_buffer.push(state, action, reward, next_state, done)
         state = next_state
-        episode_reward += action['forward'] + action['attack'] + action['back'] + action['jump'] + action['sprint']
-        episode_reward += reward
+        episode_reward += action['forward'] - action['back'] + 2*action['attack']
+        episode_reward += reward*100
         info.update_index()
         update_graph(model, target_model, optimizer, replay_buffer, args,
                      device, info)
         if done:
-            complete_episode(model, args.environment, info, episode_reward,
-                             episode, epsilon)
             break
-    if episode_reward == 0.:
-        model, target_model = initialize_models(env, device, args.checkpoint)
+    complete_episode(model, args.environment, info, episode_reward,
+                     episode, epsilon)
     # episode and reward print
-    print(f"[{episode}] Episode complete with reward {episode_reward}")
+    # print(f"[{episode}] Episode complete with reward {episode_reward}")
 
 
 def train(env, model, target_model, optimizer, replay_buffer, args, device):
@@ -86,7 +87,6 @@ def train(env, model, target_model, optimizer, replay_buffer, args, device):
     for episode in range(args.num_episodes):
         run_episode(env, model, target_model, optimizer, replay_buffer, args,
                     device, info, episode)
-
 
 def main():
     args = parse_args()
